@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шагайн тоглоом</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #fbe7fd;
+        }
+        .container {
+            width: 700px;
+            margin: 0 auto;
+        }
+        .dice-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .dice {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .board {
+            position: relative;
+            height: 150px;
+            border: 2px dashed black;
+            margin-top: 20px;
+            background: #e7f6e2;
+        }
+        .player {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .player img {
+            width: 50px;
+            height: auto;
+        }
+        .finish-line {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 10px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                black,
+                black 5px,
+                white 5px,
+                white 10px
+            );
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: rgb(255, 0, 251);
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: darkorange;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .modal.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dice-container">
+            <div class="dice" id="dice1">🐴</div>
+            <div class="dice" id="dice2">🐑</div>
+            <div class="dice" id="dice3">🐐</div>
+            <div class="dice" id="dice4">🐪</div>
+        </div>
+        <button class="button" onclick="rollDice()">Шагай орхих</button>
+        <button class="button" onclick="restartGame()">Дахин эхлүүлэх</button>
+        <div class="board">
+            <div class="player" id="player1" style="top: 30px; left: 10px;">
+                <img src="ttt.jpg" alt="Player 1">
+                <span>ТОГЛОГЧ 1</span>
+            </div>
+            <div class="player" id="player2" style="top: 90px; left: 10px;">
+                <img src="ttt.jpg" alt="Player 2">
+                <span>ТОГЛОГЧ 2</span>
+            </div>
+            <div class="finish-line"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="winnerModal">
+        <p id="winnerText"></p>
+        <button class="button" onclick="restartGame()">Дахин эхлүүлэх</button>
+    </div>
+
+    <script>
+        const diceFaces = ['🐴', '🐑', '🐐', '🐪'];
+        let currentPlayer = 1;
+
+        function rollDice() {
+            const dice = document.querySelectorAll('.dice');
+            const results = [];
+            dice.forEach(die => {
+                const randomIndex = Math.floor(Math.random() * diceFaces.length);
+                die.textContent = diceFaces[randomIndex];
+                results.push(die.textContent);
+            });
+
+            const horseCount = results.filter(face => face === '🐴').length;
+
+            if (horseCount > 0) {
+                const player = document.getElementById(`player${currentPlayer}`);
+                const currentLeft = parseInt(player.style.left);
+                const newLeft = Math.min(currentLeft + (horseCount * 50), 620);
+                player.style.left = `${newLeft}px`;
+
+                if (newLeft >= 620) {
+                    showWinner(currentPlayer);
+                    return;
+                }
+            } else {
+                alert(`ТОГЛОГЧ ${currentPlayer} морь хаясангүй.`);
+            }
+
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+        }
+
+        function showWinner(player) {
+            const modal = document.getElementById('winnerModal');
+            const winnerText = document.getElementById('winnerText');
+            winnerText.textContent = `ТОГЛОГЧ ${player} ЯЛЛАА!`;
+            modal.classList.add('active');
+        }
+
+        function restartGame() {
+            currentPlayer = 1;
+            document.getElementById('player1').style.left = '10px';
+            document.getElementById('player2').style.left = '10px';
+            const modal = document.getElementById('winnerModal');
+            modal.classList.remove('active');
+        }
+    </script>
+</body>
+</html>
